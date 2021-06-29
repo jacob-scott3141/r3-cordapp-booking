@@ -5,13 +5,14 @@ import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.ContractState
 import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.Party
+import java.util.*
 
 // *********
 // * State *
 // *********
 @BelongsToContract(TemplateContract::class)
-data class TemplateState(val msg: String,
-                         val sender: Party,
-                         val receiver: Party,
-                         override val participants: List<AbstractParty> = listOf(sender,receiver)
+data class Appointment(val date: Date,
+                       val doctor: Party,
+                       val patient: Party,
+                       override val participants: List<AbstractParty> = listOf(doctor, patient)
 ) : ContractState
