@@ -14,7 +14,7 @@ import java.util.*
 //TODO is this the right way to make the contract visible to anyone? Like, is the constructor right?
 data class AvailableAppointmentDate(val date: Date,
                                     val doctor: Party,
-                                    val bob: Party,
                                     val alice: Party,
+                                    val bob: Party,
                                     override val participants: List<AbstractParty> = listOf(doctor, bob, alice)
 ) : ContractState
