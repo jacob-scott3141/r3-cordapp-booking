@@ -19,9 +19,10 @@ import com.template.contracts.TemplateContract
 
 import net.corda.core.transactions.TransactionBuilder
 
-import com.template.states.TemplateState
+import com.template.states.AvailableAppointmentDate
 import net.corda.core.contracts.requireThat
 import net.corda.core.identity.AbstractParty
+import java.util.*
 
 
 // *********
@@ -29,25 +30,32 @@ import net.corda.core.identity.AbstractParty
 // *********
 @InitiatingFlow
 @StartableByRPC
-class Initiator(private val receiver: Party) : FlowLogic<SignedTransaction>() {
+class CreateAppointmentDate(private val doctor: Party,
+                private val alice: Party,
+                private val bob: Party,
+                private val date: Date) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
 
     @Suspendable
     override fun call(): SignedTransaction {
-        //Hello World message
-        val msg = "Hello-World"
+
         val sender = ourIdentity
 
         // Step 1. Get a reference to the notary service on our network and our key pair.
         // Note: ongoing work to support multiple notary identities is still in progress.
         val notary = serviceHub.networkMapCache.notaryIdentities[0]
 
-        //Compose the State that carries the Hello World message
-        val output = TemplateState(msg, sender, receiver)
+        //Compose the State that carries the appointment information
+        val output = AvailableAppointmentDate(
+            date,
+            doctor,
+            alice,
+            bob
+        )
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(TemplateContract.Commands.Create(), listOf(sender.owningKey, receiver.owningKey))
+                .addCommand(TemplateContract.Commands.Create(), listOf(sender.owningKey, alice.owningKey, bob.owningKey))
                 .addOutputState(output)
 
         // Step 4. Verify and sign it with our KeyPair.
@@ -67,13 +75,14 @@ class Initiator(private val receiver: Party) : FlowLogic<SignedTransaction>() {
     }
 }
 
-@InitiatedBy(Initiator::class)
+@InitiatedBy(CreateAppointmentDate::class)
 class Responder(val counterpartySession: FlowSession) : FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
         val signTransactionFlow = object : SignTransactionFlow(counterpartySession) {
             override fun checkTransaction(stx: SignedTransaction) = requireThat {
                //Addition checks
+                //TODO think about what checks can be done here
             }
         }
         val txId = subFlow(signTransactionFlow).id
