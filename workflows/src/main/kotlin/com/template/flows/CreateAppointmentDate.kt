@@ -30,14 +30,15 @@ import java.util.*
 // *********
 @InitiatingFlow
 @StartableByRPC
-class CreateAppointmentDate(private val doctor: Party,
-                private val alice: Party,
-                private val bob: Party,
-                private val date: Date) : FlowLogic<SignedTransaction>() {
+class CreateAppointmentDate(private val alice: Party,
+                            private val bob: Party,
+                            private val date: Date) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
 
     @Suspendable
     override fun call(): SignedTransaction {
+
+        val doctor = ourIdentity
 
         // Step 1. Get a reference to the notary service on our network and our key pair.
         // Note: ongoing work to support multiple notary identities is still in progress.

@@ -31,15 +31,14 @@ import java.util.*
 @InitiatingFlow
 @StartableByRPC
 class CreateAppointmentRequest(private val doctor: Party,
-                                private val alice: Party,
-                                private val bob: Party,
-                                private val date: Date) : FlowLogic<SignedTransaction>() {
+                               private val bob: Party,
+                               private val date: Date) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
 
     @Suspendable
     override fun call(): SignedTransaction {
 
-        val sender = ourIdentity
+        val alice = ourIdentity
 
         // Step 1. Get a reference to the notary service on our network and our key pair.
         // Note: ongoing work to support multiple notary identities is still in progress.
@@ -55,7 +54,7 @@ class CreateAppointmentRequest(private val doctor: Party,
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(TemplateContract.Commands.Create(), listOf(sender.owningKey, alice.owningKey, bob.owningKey))
+                .addCommand(TemplateContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey, bob.owningKey))
                 .addOutputState(output)
 
         // Step 4. Verify and sign it with our KeyPair.
