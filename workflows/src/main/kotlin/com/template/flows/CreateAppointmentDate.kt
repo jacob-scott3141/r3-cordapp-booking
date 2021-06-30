@@ -54,7 +54,7 @@ class CreateAppointmentDate(private val alice: Party,
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(TemplateContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey, bob.owningKey))
+                .addCommand(TemplateContract.Commands.Create(), listOf(doctor.owningKey))
                 .addOutputState(output)
 
         // Step 4. Verify and sign it with our KeyPair.
@@ -62,12 +62,12 @@ class CreateAppointmentDate(private val alice: Party,
         val ptx = serviceHub.signInitialTransaction(builder)
 
 
-        // Step 6. Collect the other party's signature using the SignTransactionFlow.
+        // Step 6. Collect the other party's and send using the FinalityFlow.
         val otherParties: MutableList<Party> = output.participants.stream().map { el: AbstractParty? -> el as Party? }.collect(Collectors.toList())
         otherParties.remove(ourIdentity)
         val sessions = otherParties.stream().map { el: Party? -> initiateFlow(el!!) }.collect(Collectors.toList())
 
-        val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
+        val stx = subFlow(FinalityFlow(ptx, sessions))
 
         // Step 7. Assuming no exceptions, we can now finalise the transaction
         return subFlow<SignedTransaction>(FinalityFlow(stx, sessions))
@@ -78,14 +78,7 @@ class CreateAppointmentDate(private val alice: Party,
 class CreateDateResponder(val counterpartySession: FlowSession) : FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
-        val signTransactionFlow = object : SignTransactionFlow(counterpartySession) {
-            override fun checkTransaction(stx: SignedTransaction) = requireThat {
-               //Addition checks
-                //TODO think about what checks can be done here
-            }
-        }
-        val txId = subFlow(signTransactionFlow).id
-        return subFlow(ReceiveFinalityFlow(counterpartySession, expectedTxId = txId))
+        return subFlow(ReceiveFinalityFlow(counterpartySession))
     }
 }
 
