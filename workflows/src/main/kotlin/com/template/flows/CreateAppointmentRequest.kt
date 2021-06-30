@@ -16,6 +16,7 @@ import net.corda.core.flows.FlowSession
 import net.corda.core.identity.Party
 
 import com.template.contracts.TemplateContract
+import com.template.states.AppointmentRequest
 
 import net.corda.core.transactions.TransactionBuilder
 
@@ -45,11 +46,10 @@ class CreateAppointmentRequest(private val doctor: Party,
         val notary = serviceHub.networkMapCache.notaryIdentities[0]
 
         //Compose the State that carries the appointment information
-        val output = AvailableAppointmentDate(
+        val output = AppointmentRequest(
                 date,
                 doctor,
-                alice,
-                bob
+                alice
         )
 
         // Step 3. Create a new TransactionBuilder object.
