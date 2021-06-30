@@ -21,6 +21,7 @@ import com.template.states.AppointmentRequest
 import net.corda.core.transactions.TransactionBuilder
 
 import com.template.states.AvailableAppointmentDate
+import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.requireThat
 import net.corda.core.identity.AbstractParty
 import java.util.*
@@ -33,7 +34,8 @@ import java.util.*
 @StartableByRPC
 class CreateAppointmentRequest(private val doctor: Party,
                                private val bob: Party,
-                               private val date: Date) : FlowLogic<SignedTransaction>() {
+                               private val date: Date,
+                               private val appointmentDate: StateAndRef<AvailableAppointmentDate>) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
 
     @Suspendable
@@ -56,6 +58,7 @@ class CreateAppointmentRequest(private val doctor: Party,
         val builder = TransactionBuilder(notary)
                 .addCommand(TemplateContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey, bob.owningKey))
                 .addOutputState(output)
+                .addReferenceState(appointmentDate.referenced())
 
         // Step 4. Verify and sign it with our KeyPair.
         builder.verify(serviceHub)
@@ -79,13 +82,6 @@ class CreateAppointmentRequest(private val doctor: Party,
 class CreateRequestResponder(val counterpartySession: FlowSession) : FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
-        val signTransactionFlow = object : SignTransactionFlow(counterpartySession) {
-            override fun checkTransaction(stx: SignedTransaction) = requireThat {
-                //Addition checks
-                //TODO think about what checks can be done here
-            }
-        }
-        val txId = subFlow(signTransactionFlow).id
-        return subFlow(ReceiveFinalityFlow(counterpartySession, expectedTxId = txId))
+        return subFlow(ReceiveFinalityFlow(counterpartySession));
     }
 }
