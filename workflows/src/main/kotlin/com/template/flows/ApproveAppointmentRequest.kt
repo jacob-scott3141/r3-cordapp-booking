@@ -74,5 +74,19 @@ class ApproveAppointmentRequest(private val alice: Party,
     }
 }
 
+@InitiatedBy(ApproveAppointmentRequest::class)
+class ApprovalResponder(val counterpartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+    @Suspendable
+    override fun call(): SignedTransaction {
+        val signTransactionFlow = object : SignTransactionFlow(counterpartySession) {
+            override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                //Addition checks
+                //TODO think about what checks can be done here
+            }
+        }
+        val txId = subFlow(signTransactionFlow).id
+        return subFlow(ReceiveFinalityFlow(counterpartySession, expectedTxId = txId))
+    }
+}
 
 

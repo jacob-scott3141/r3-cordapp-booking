@@ -75,7 +75,7 @@ class CreateAppointmentDate(private val alice: Party,
 }
 
 @InitiatedBy(CreateAppointmentDate::class)
-class Responder(val counterpartySession: FlowSession) : FlowLogic<SignedTransaction>() {
+class CreateDateResponder(val counterpartySession: FlowSession) : FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
         val signTransactionFlow = object : SignTransactionFlow(counterpartySession) {
