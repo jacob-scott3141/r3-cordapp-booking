@@ -12,7 +12,7 @@ import java.util.*
 // *********
 @BelongsToContract(TemplateContract::class)
 //TODO is this the right way to make the contract visible to anyone? Like, is the constructor right?
-data class AvailableAppointmentDate(val date: Date,
+data class AvailableAppointmentDate(val date: String,
                                     val doctor: Party,
                                     val alice: Party,
                                     val bob: Party,

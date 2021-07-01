@@ -34,7 +34,7 @@ import java.util.*
 @StartableByRPC
 class CreateAppointmentRequest(private val doctor: Party,
                                private val bob: Party,
-                               private val date: Date,
+                               private val date: String,
                                private val appointmentDate: StateAndRef<AvailableAppointmentDate>) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
 
