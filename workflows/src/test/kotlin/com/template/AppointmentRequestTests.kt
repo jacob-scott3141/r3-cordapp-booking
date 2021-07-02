@@ -40,19 +40,19 @@ class AppointmentRequestTests {
         network.stopNodes()
     }
     @Test
-    fun RequestAppointmentTest() {
-        val availableDateFlow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], Date())
-        doctor.startFlow(availableDateFlow)
+    fun requestAppointmentTest() {
+        val availableDateFlow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], Date().toString())
+        val future1 = doctor.startFlow(availableDateFlow)
+        future1.getOrThrow();
 
         val dateAttribute = AppointmentDateSchemaV1.AvailableDate::date.equal("01-07-2021")
         val customCriteria = QueryCriteria.VaultCustomQueryCriteria(dateAttribute)
-//        val inputCriteria: QueryCriteria = QueryCriteria.VaultQueryCriteria().withStatus(Vault.StateStatus.UNCONSUMED)
-        val appointmentDate = alice.services.vaultService.queryBy(AvailableAppointmentDate::class.java, customCriteria).states[0]
-        println(appointmentDate)
+        val inputCriteria: QueryCriteria = QueryCriteria.VaultQueryCriteria().withStatus(Vault.StateStatus.UNCONSUMED)
+        val appointmentDate = alice.services.vaultService.queryBy(AvailableAppointmentDate::class.java, inputCriteria).states[0]
 
-        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], bob.info.legalIdentities[0], Date(), appointmentDate)
+        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], bob.info.legalIdentities[0], Date().toString(), appointmentDate)
         val future: Future<SignedTransaction> = alice.startFlow(flow)
         network.runNetwork()
-        future.getOrThrow()
+//        future.getOrThrow()
     }
 }

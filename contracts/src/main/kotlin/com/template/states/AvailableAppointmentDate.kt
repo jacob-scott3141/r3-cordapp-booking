@@ -16,7 +16,7 @@ import java.util.*
 // * State *
 // *********
 @BelongsToContract(TemplateContract::class)
-data class AvailableAppointmentDate(val date: Date,
+data class AvailableAppointmentDate(val date: String,
                                     val doctor: Party,
                                     val alice: Party,
                                     val bob: Party,
