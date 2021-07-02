@@ -11,7 +11,7 @@ import java.util.*
 // * State *
 // *********
 @BelongsToContract(TemplateContract::class)
-data class AppointmentRequest(val date: Date,
+data class AppointmentRequest(val date: String,
                               val doctor: Party,
                               val patient: Party,
                               override val participants: List<AbstractParty> = listOf(doctor, patient)

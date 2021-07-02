@@ -32,7 +32,7 @@ import java.util.*
 @StartableByRPC
 class DenyAppointmentRequest(private val alice: Party,
                              private val bob: Party,
-                             private val date: Date) : FlowLogic<SignedTransaction>() {
+                             private val date: String) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
 
     @Suspendable
