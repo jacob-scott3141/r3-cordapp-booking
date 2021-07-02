@@ -16,12 +16,19 @@ import net.corda.core.flows.FlowSession
 import net.corda.core.identity.Party
 
 import com.template.contracts.TemplateContract
+import com.template.states.Appointment
+import com.template.states.AppointmentRequest
 
 import net.corda.core.transactions.TransactionBuilder
 
 import com.template.states.AvailableAppointmentDate
+import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.requireThat
 import net.corda.core.identity.AbstractParty
+import net.corda.core.identity.CordaX500Name
+import net.corda.core.node.services.StatesNotAvailableException
+import java.lang.Exception
+import java.security.PublicKey
 import java.util.*
 
 
@@ -31,7 +38,6 @@ import java.util.*
 @InitiatingFlow
 @StartableByRPC
 class DenyAppointmentRequest(private val alice: Party,
-                             private val bob: Party,
                              private val date: String) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
 
@@ -45,22 +51,29 @@ class DenyAppointmentRequest(private val alice: Party,
         val notary = serviceHub.networkMapCache.notaryIdentities[0]
 
         //Compose the State that carries the appointment information
-        val output = AvailableAppointmentDate(
-                date,
-                doctor,
-                alice,
-                bob
-        )
+
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(TemplateContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey, bob.owningKey))
-                .addOutputState(output)
+                .addCommand(TemplateContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey))
+
 
         // Step 4. Verify and sign it with our KeyPair.
         builder.verify(serviceHub)
         val ptx = serviceHub.signInitialTransaction(builder)
 
+        val states = serviceHub.vaultService.queryBy(Appointment::class.java)
+        //get state from states using id
+        var output: Appointment? = null
+        for(state: StateAndRef<Appointment> in states.states){
+            if(date == state.state.data.date){
+                output=state.state.data
+            }
+        }
+
+        if(output==null){
+            throw StatesNotAvailableException("State not Found")
+        }
 
         // Step 6. Collect the other party's signature using the SignTransactionFlow.
         val otherParties: MutableList<Party> = output.participants.stream().map { el: AbstractParty? -> el as Party? }.collect(Collectors.toList())
