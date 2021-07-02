@@ -67,10 +67,8 @@ class CreateAppointmentDate(private val alice: Party,
         otherParties.remove(ourIdentity)
         val sessions = otherParties.stream().map { el: Party? -> initiateFlow(el!!) }.collect(Collectors.toList())
 
-        val stx = subFlow(FinalityFlow(ptx, sessions))
-
         // Step 7. Assuming no exceptions, we can now finalise the transaction
-        return subFlow<SignedTransaction>(FinalityFlow(stx, sessions))
+        return subFlow<SignedTransaction>(FinalityFlow(ptx, sessions))
     }
 }
 
