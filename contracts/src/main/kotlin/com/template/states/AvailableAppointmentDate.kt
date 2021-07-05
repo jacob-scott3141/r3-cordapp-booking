@@ -1,5 +1,6 @@
 package com.template.states
 
+import com.template.contracts.CreateAppointmentDateContract
 import com.template.contracts.TemplateContract
 import com.template.schemas.AppointmentDateSchemaV1
 import net.corda.core.contracts.BelongsToContract
@@ -15,7 +16,7 @@ import java.util.*
 // *********
 // * State *
 // *********
-@BelongsToContract(TemplateContract::class)
+@BelongsToContract(CreateAppointmentDateContract::class)
 data class AvailableAppointmentDate(val date: String,
                                     val doctor: Party,
                                     val alice: Party,
