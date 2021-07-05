@@ -11,6 +11,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class CreateAppointmentDateContract : Contract {
+    companion object {
+        // Used to identify our contract when building a transaction.
+        const val ID = "com.template.contracts.CreateAppointmentDateContract"
+    }
 
     private fun checkDate(dateStr : String) : Boolean {
         var format = SimpleDateFormat("dd-MM-yyyy", Locale.UK)

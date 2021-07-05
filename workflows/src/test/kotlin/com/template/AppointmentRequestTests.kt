@@ -14,6 +14,7 @@ import com.template.states.AvailableAppointmentDate
 import net.corda.core.node.services.Vault
 import net.corda.core.node.services.vault.Builder.equal
 import net.corda.core.utilities.getOrThrow
+import net.corda.testing.common.internal.testNetworkParameters
 import java.util.*
 
 
@@ -25,10 +26,12 @@ class AppointmentRequestTests {
 
     @Before
     fun setup() {
+        val myNetworkParameters = testNetworkParameters(minimumPlatformVersion = 4)
         network = MockNetwork(MockNetworkParameters(cordappsForAllNodes = listOf(
             TestCordapp.findCordapp("com.template.contracts"),
             TestCordapp.findCordapp("com.template.flows")
-        )))
+        ),
+            networkParameters = myNetworkParameters))
         doctor = network.createPartyNode()
         alice = network.createPartyNode()
         bob = network.createPartyNode()
@@ -50,7 +53,7 @@ class AppointmentRequestTests {
         val inputCriteria: QueryCriteria = QueryCriteria.VaultQueryCriteria().withStatus(Vault.StateStatus.UNCONSUMED)
         val appointmentDate = alice.services.vaultService.queryBy(AvailableAppointmentDate::class.java, inputCriteria).states[0]
 
-        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], bob.info.legalIdentities[0], Date().toString(), appointmentDate)
+        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], Date().toString(), appointmentDate)
         val future: Future<SignedTransaction> = alice.startFlow(flow)
         network.runNetwork()
 //        future.getOrThrow()
