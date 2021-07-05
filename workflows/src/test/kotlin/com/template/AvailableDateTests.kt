@@ -14,7 +14,7 @@ import net.corda.core.utilities.getOrThrow
 import java.util.*
 
 
-class FlowTests {
+class AvailableDateTests {
     private lateinit var network: MockNetwork
     private lateinit var doctor: StartedMockNode
     private lateinit var alice: StartedMockNode

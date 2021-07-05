@@ -33,7 +33,6 @@ import java.util.*
 @InitiatingFlow
 @StartableByRPC
 class CreateAppointmentRequest(private val doctor: Party,
-                               private val bob: Party,
                                private val date: String,
                                private val appointmentDate: StateAndRef<AvailableAppointmentDate>) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
@@ -56,7 +55,7 @@ class CreateAppointmentRequest(private val doctor: Party,
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(TemplateContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey, bob.owningKey))
+                .addCommand(TemplateContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey))
                 .addOutputState(output)
                 .addReferenceState(appointmentDate.referenced())
 
