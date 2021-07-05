@@ -22,6 +22,6 @@ object AppointmentDateSchemaV1 : MappedSchema(
     )
     class AvailableDate(
         @Column(name = "date", nullable = false)
-        var date: String
+        var date: String? = null
     ) : PersistentState()
 }
