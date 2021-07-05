@@ -10,7 +10,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CreateAppointmentDateContract : Contract {
+class CreateAppointmentRequestContract : Contract {
 
     private fun checkDate(dateStr : String) : Boolean {
         var format = SimpleDateFormat("dd-MM-yyyy", Locale.UK)
@@ -26,6 +26,7 @@ class CreateAppointmentDateContract : Contract {
     override fun verify(tx: LedgerTransaction) {
         requireThat {
             "No inputs should be consumed when issuing a date" using (tx.inputs.isEmpty())
+            "1 reference state should be used" using (tx.referenceStates.size == 1)
             "Only one output state is created" using (tx.outputs.size == 1)
 
             val out = tx.outputs.single() as AvailableAppointmentDate

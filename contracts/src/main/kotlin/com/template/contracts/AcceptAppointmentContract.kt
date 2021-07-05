@@ -2,6 +2,7 @@ package com.template.contracts
 
 import com.template.states.Appointment
 import com.template.states.AvailableAppointmentDate
+import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
@@ -20,6 +21,9 @@ class AcceptAppointmentContract : Contract {
 
 
         }
+    }
+    interface Commands : CommandData {
+        class Create : TemplateContract.Commands
     }
 
 }

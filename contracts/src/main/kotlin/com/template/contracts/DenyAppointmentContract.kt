@@ -2,6 +2,7 @@ package com.template.contracts
 
 import com.template.states.Appointment
 import com.template.states.AvailableAppointmentDate
+import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
@@ -9,7 +10,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DenyAppointmentDateContract : Contract {
+class DenyAppointmentContract : Contract {
 
     override fun verify(tx: LedgerTransaction) {
         requireThat {
@@ -20,6 +21,10 @@ class DenyAppointmentDateContract : Contract {
 
 
         }
+    }
+
+    interface Commands : CommandData {
+        class Create : TemplateContract.Commands
     }
 
 }

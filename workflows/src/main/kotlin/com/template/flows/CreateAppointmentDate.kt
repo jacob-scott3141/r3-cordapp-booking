@@ -1,6 +1,7 @@
 package com.template.flows
 
 import co.paralleluniverse.fibers.Suspendable
+import com.template.contracts.CreateAppointmentDateContract
 import net.corda.core.flows.*
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.flows.FinalityFlow
@@ -54,7 +55,7 @@ class CreateAppointmentDate(private val alice: Party,
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(TemplateContract.Commands.Create(), listOf(doctor.owningKey))
+                .addCommand(CreateAppointmentDateContract.Commands.Create(), listOf(doctor.owningKey))
                 .addOutputState(output)
 
         // Step 4. Verify and sign it with our KeyPair.
