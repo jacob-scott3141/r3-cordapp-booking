@@ -21,7 +21,7 @@ class AcceptAppointmentContract : Contract {
             "2 inputs should be consumed when accepting an appointment" using (tx.inputs.size == 2)
             "Only one output state is created" using (tx.outputs.size == 1)
 
-            val out = tx.outputs.single() as Appointment
+            //val out = tx.outputs.single() as Appointment
 
 
         }
