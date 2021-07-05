@@ -1,6 +1,7 @@
 package com.template.contracts
 
 import com.template.states.Appointment
+import com.template.states.AppointmentRequest
 import com.template.states.AvailableAppointmentDate
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
@@ -17,7 +18,7 @@ class CreateAppointmentRequestContract : Contract {
     }
 
     private fun checkDate(dateStr : String) : Boolean {
-        var format = SimpleDateFormat("dd-MM-yyyy", Locale.UK)
+        var format = SimpleDateFormat("dd-MM-yyyy")
         try{
             val date = format.parse(dateStr)
         }
@@ -33,7 +34,7 @@ class CreateAppointmentRequestContract : Contract {
             "1 reference state should be used" using (tx.referenceStates.size == 1)
             "Only one output state is created" using (tx.outputs.size == 1)
 
-            val out = tx.outputs.single() as AvailableAppointmentDate
+            val out = tx.outputStates[0] as AppointmentRequest
             "Dates must be of the format dd-MM-yyyy" using (checkDate(out.date))
 
 

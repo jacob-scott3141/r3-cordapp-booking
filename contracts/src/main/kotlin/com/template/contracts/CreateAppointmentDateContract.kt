@@ -17,7 +17,7 @@ class CreateAppointmentDateContract : Contract {
     }
 
     private fun checkDate(dateStr : String) : Boolean {
-        var format = SimpleDateFormat("dd-MM-yyyy", Locale.UK)
+        var format = SimpleDateFormat("dd-MM-yyyy")
         try{
             val date = format.parse(dateStr)
         }
@@ -32,7 +32,7 @@ class CreateAppointmentDateContract : Contract {
             "No inputs should be consumed when issuing a date" using (tx.inputs.isEmpty())
             "Only one output state is created" using (tx.outputs.size == 1)
 
-            val out = tx.outputs.single() as AvailableAppointmentDate
+            val out = tx.outputStates[0] as AvailableAppointmentDate
             "Dates must be of the format dd-MM-yyyy" using (checkDate(out.date))
 
 

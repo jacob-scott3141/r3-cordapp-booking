@@ -42,7 +42,7 @@ class AppointmentRequestTests {
     }
     @Test
     fun requestAppointmentTest() {
-        val availableDateFlow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], Date().toString())
+        val availableDateFlow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], "06-07-2021")
         val future1 = doctor.startFlow(availableDateFlow)
 
         network.runNetwork()
@@ -53,7 +53,7 @@ class AppointmentRequestTests {
         val inputCriteria: QueryCriteria = QueryCriteria.VaultQueryCriteria().withStatus(Vault.StateStatus.UNCONSUMED)
         val appointmentDate = alice.services.vaultService.queryBy(AvailableAppointmentDate::class.java, inputCriteria).states[0]
 
-        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], Date().toString(), appointmentDate)
+        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], "06-07-2021", appointmentDate)
         val future: Future<SignedTransaction> = alice.startFlow(flow)
         network.runNetwork()
         future.getOrThrow()
