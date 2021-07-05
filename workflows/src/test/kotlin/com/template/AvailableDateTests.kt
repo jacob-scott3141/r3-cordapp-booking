@@ -1,5 +1,6 @@
 package com.template
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.template.flows.CreateAppointmentDate
 import com.template.states.AvailableAppointmentDate
 import net.corda.testing.node.*
@@ -47,12 +48,5 @@ class AvailableDateTests {
         val state = alice.services.vaultService.queryBy(AvailableAppointmentDate::class.java, inputCriteria).states[0].state.data
 
         future.getOrThrow()
-        /*
-        TODO sort this out
-            O=Mock Company 3, L=London, C=GB has finished prematurely and we're trying to send them the finalised transaction.
-            Did they forget to call ReceiveFinalityFlow? (Tried to access ended session SessionId(toLong=4361128774027148188))
-            net.corda.core.flows.UnexpectedFlowEndException: O=Mock Company 3, L=London, C=GB has finished prematurely and
-            we're trying to send them the finalised transaction. Did they forget to call ReceiveFinalityFlow?
-         */
     }
 }

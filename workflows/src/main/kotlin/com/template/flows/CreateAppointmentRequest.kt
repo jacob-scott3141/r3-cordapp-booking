@@ -17,17 +17,13 @@ import net.corda.core.flows.FlowSession
 
 import net.corda.core.identity.Party
 
-import com.template.contracts.TemplateContract
 import com.template.states.AppointmentRequest
 
 import net.corda.core.transactions.TransactionBuilder
 
 import com.template.states.AvailableAppointmentDate
 import net.corda.core.contracts.StateAndRef
-import net.corda.core.contracts.requireThat
 import net.corda.core.identity.AbstractParty
-import java.util.*
-
 
 // *********
 // * Flows *
@@ -71,10 +67,8 @@ class CreateAppointmentRequest(private val doctor: Party,
         otherParties.remove(ourIdentity)
         val sessions = otherParties.stream().map { el: Party? -> initiateFlow(el!!) }.collect(Collectors.toList())
 
-        val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
-
         // Step 7. Assuming no exceptions, we can now finalise the transaction
-        return subFlow<SignedTransaction>(FinalityFlow(stx, sessions))
+        return subFlow<SignedTransaction>(FinalityFlow(ptx, sessions))
     }
 
 }

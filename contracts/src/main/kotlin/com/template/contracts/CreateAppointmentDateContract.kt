@@ -39,7 +39,7 @@ class CreateAppointmentDateContract : Contract {
         }
     }
     interface Commands : CommandData {
-        class Create : TemplateContract.Commands
+        class Create : CreateAppointmentDateContract.Commands
     }
 
 }
