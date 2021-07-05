@@ -19,7 +19,7 @@ class CreateAppointmentDateContract : Contract {
     private fun checkDate(dateStr : String) : Boolean {
         var format = SimpleDateFormat("dd-MM-yyyy")
         try{
-            val date = format.parse(dateStr)
+            format.parse(dateStr)
         }
         catch(e : ParseException){
             return false

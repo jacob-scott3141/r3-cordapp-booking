@@ -21,7 +21,7 @@ class DenyAppointmentContract : Contract {
             "1 input should be consumed when denying an appointment" using (tx.inputs.size == 1)
             "No output state is created" using (tx.outputs.isEmpty())
 
-            val out = tx.outputs.single() as AvailableAppointmentDate
+            //val out = tx.outputs.single() as AvailableAppointmentDate
 
 
         }
