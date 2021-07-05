@@ -1,6 +1,5 @@
 package com.template.contracts
 
-import com.template.states.Appointment
 import com.template.states.AppointmentRequest
 import com.template.states.AvailableAppointmentDate
 import net.corda.core.identity.CordaX500Name
@@ -27,9 +26,9 @@ class ContractTests {
             //pass
             transaction {
                 //passing transaction
-                reference(CreateAppointmentRequestContract.ID, stateReference)
-                output(CreateAppointmentRequestContract.ID, state)
-                command(listOf(doctor.publicKey, alice.publicKey), CreateAppointmentRequestContract.Commands.Create())
+                reference(AppointmentRequestContract.ID, stateReference)
+                output(AppointmentRequestContract.ID, state)
+                command(alice.publicKey, AppointmentRequestContract.Commands.Create())
                 verifies()
             }
         }

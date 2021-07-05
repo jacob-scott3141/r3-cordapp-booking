@@ -1,20 +1,17 @@
 package com.template.contracts
 
-import com.template.states.Appointment
 import com.template.states.AppointmentRequest
-import com.template.states.AvailableAppointmentDate
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.*
 
-class CreateAppointmentRequestContract : Contract {
+class AppointmentRequestContract : Contract {
     companion object {
         // Used to identify our contract when building a transaction.
-        const val ID = "com.template.contracts.CreateAppointmentRequestContract"
+        const val ID = "com.template.contracts.AppointmentRequestContract"
     }
 
     private fun checkDate(dateStr : String) : Boolean {
@@ -39,6 +36,6 @@ class CreateAppointmentRequestContract : Contract {
         }
     }
     interface Commands : CommandData {
-        class Create : CreateAppointmentRequestContract.Commands
+        class Create : AppointmentRequestContract.Commands
     }
 }

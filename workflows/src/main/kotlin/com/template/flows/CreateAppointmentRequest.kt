@@ -1,13 +1,10 @@
 package com.template.flows
 
 import co.paralleluniverse.fibers.Suspendable
-import com.template.contracts.CreateAppointmentDateContract
-import com.template.contracts.CreateAppointmentRequestContract
+import com.template.contracts.AppointmentRequestContract
 import net.corda.core.flows.*
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.flows.FinalityFlow
-
-import net.corda.core.flows.CollectSignaturesFlow
 
 import net.corda.core.transactions.SignedTransaction
 
@@ -53,7 +50,7 @@ class CreateAppointmentRequest(private val doctor: Party,
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(CreateAppointmentRequestContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey))
+                .addCommand(AppointmentRequestContract.Commands.Create(), listOf(alice.owningKey))
                 .addOutputState(output)
                 .addReferenceState(appointmentDate.referenced())
 
