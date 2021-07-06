@@ -3,6 +3,7 @@ package com.template.flows
 import co.paralleluniverse.fibers.Suspendable
 import com.template.contracts.AppointmentContract
 import com.template.states.Appointment
+import com.template.states.AppointmentRequest
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
@@ -21,7 +22,8 @@ import java.util.stream.Collectors
 @InitiatingFlow
 @StartableByRPC
 class DenyAppointmentRequest(private val alice: Party,
-                             private val date: String) : FlowLogic<SignedTransaction>() {
+                             private val date: String,
+                             private val request: StateAndRef<AppointmentRequest>) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
 
     @Suspendable
@@ -38,7 +40,8 @@ class DenyAppointmentRequest(private val alice: Party,
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(AppointmentContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey))
+                        .addInputState(request)
+                        .addCommand(AppointmentContract.Commands.Create(), listOf(doctor.owningKey))
 
 
         // Step 4. Verify and sign it with our KeyPair.

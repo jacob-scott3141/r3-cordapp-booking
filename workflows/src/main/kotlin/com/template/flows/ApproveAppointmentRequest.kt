@@ -17,6 +17,9 @@ import net.corda.core.flows.FlowSession
 import net.corda.core.identity.Party
 
 import com.template.states.Appointment
+import com.template.states.AppointmentRequest
+import com.template.states.AvailableAppointmentDate
+import net.corda.core.contracts.StateAndRef
 
 import net.corda.core.transactions.TransactionBuilder
 
@@ -31,7 +34,9 @@ import java.util.*
 @InitiatingFlow
 @StartableByRPC
 class ApproveAppointmentRequest(private val alice: Party,
-                                private val date: String) : FlowLogic<SignedTransaction>() {
+                                private val date: String,
+                                private val availableDate: StateAndRef<AvailableAppointmentDate>,
+                                private val request: StateAndRef<AppointmentRequest>) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
 
     @Suspendable
@@ -52,7 +57,9 @@ class ApproveAppointmentRequest(private val alice: Party,
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(AppointmentContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey))
+                .addCommand(AppointmentContract.Commands.Create(), listOf(doctor.owningKey))
+                .addInputState(availableDate)
+                .addInputState(request)
                 .addOutputState(output)
 
         // Step 4. Verify and sign it with our KeyPair.
