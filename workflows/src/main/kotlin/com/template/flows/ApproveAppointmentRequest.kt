@@ -1,7 +1,7 @@
 package com.template.flows
 
 import co.paralleluniverse.fibers.Suspendable
-import com.template.contracts.AcceptAppointmentContract
+import com.template.contracts.AppointmentContract
 import net.corda.core.flows.*
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.flows.FinalityFlow
@@ -16,12 +16,10 @@ import net.corda.core.flows.FlowSession
 
 import net.corda.core.identity.Party
 
-import com.template.contracts.TemplateContract
 import com.template.states.Appointment
 
 import net.corda.core.transactions.TransactionBuilder
 
-import com.template.states.AvailableAppointmentDate
 import net.corda.core.contracts.requireThat
 import net.corda.core.identity.AbstractParty
 import java.util.*
@@ -54,7 +52,7 @@ class ApproveAppointmentRequest(private val alice: Party,
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(AcceptAppointmentContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey))
+                .addCommand(AppointmentContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey))
                 .addOutputState(output)
 
         // Step 4. Verify and sign it with our KeyPair.

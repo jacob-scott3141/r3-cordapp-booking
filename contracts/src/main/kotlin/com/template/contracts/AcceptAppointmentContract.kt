@@ -10,7 +10,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AcceptAppointmentContract : Contract {
+class AppointmentContract : Contract {
     companion object {
         // Used to identify our contract when building a transaction.
         const val ID = "com.template.contracts.AcceptAppointmentContract"
@@ -27,7 +27,7 @@ class AcceptAppointmentContract : Contract {
         }
     }
     interface Commands : CommandData {
-        class Create : TemplateContract.Commands
+        class Create : AppointmentContract.Commands
     }
 
 }

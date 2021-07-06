@@ -54,6 +54,7 @@ class AppointmentRequestTests {
         val customCriteria = QueryCriteria.VaultCustomQueryCriteria(dateAttribute)
         val appointmentDate = alice.services.vaultService.queryBy(AvailableAppointmentDate::class.java, customCriteria).states[0]
 
+        // should try to run a vault query to see if the appointment request state was in fact created
         val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], "06-07-2021", appointmentDate)
         val future: Future<SignedTransaction> = alice.startFlow(flow)
         network.runNetwork()

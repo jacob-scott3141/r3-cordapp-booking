@@ -1,36 +1,18 @@
 package com.template.flows
 
 import co.paralleluniverse.fibers.Suspendable
-import com.template.contracts.DenyAppointmentContract
-import net.corda.core.flows.*
-import net.corda.core.utilities.ProgressTracker
-import net.corda.core.flows.FinalityFlow
-
-import net.corda.core.flows.CollectSignaturesFlow
-
-import net.corda.core.transactions.SignedTransaction
-
-import java.util.stream.Collectors
-
-import net.corda.core.flows.FlowSession
-
-import net.corda.core.identity.Party
-
-import com.template.contracts.TemplateContract
+import com.template.contracts.AppointmentContract
 import com.template.states.Appointment
-import com.template.states.AppointmentRequest
-
-import net.corda.core.transactions.TransactionBuilder
-
-import com.template.states.AvailableAppointmentDate
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.requireThat
+import net.corda.core.flows.*
 import net.corda.core.identity.AbstractParty
-import net.corda.core.identity.CordaX500Name
+import net.corda.core.identity.Party
 import net.corda.core.node.services.StatesNotAvailableException
-import java.lang.Exception
-import java.security.PublicKey
-import java.util.*
+import net.corda.core.transactions.SignedTransaction
+import net.corda.core.transactions.TransactionBuilder
+import net.corda.core.utilities.ProgressTracker
+import java.util.stream.Collectors
 
 
 // *********
@@ -56,7 +38,7 @@ class DenyAppointmentRequest(private val alice: Party,
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(DenyAppointmentContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey))
+                .addCommand(AppointmentContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey))
 
 
         // Step 4. Verify and sign it with our KeyPair.
