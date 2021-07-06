@@ -43,12 +43,14 @@ class AppointmentRequestContract : Contract {
             is Commands.Accept -> {
                 requireThat {
                     "2 inputs should be consumed when accepting a request" using (tx.inputs.size == 1)
+                    "No reference states should be used when accepting a request" using (tx.references.isEmpty())
                     "1 Output state is created" using (tx.outputs.size == 1)
                 }
             }
             is Commands.Deny -> {
                 requireThat {
-                    "1 input should be consumed when denying a request" using (tx.inputs.size == 1)
+                    "1 input should be consumed when denying a request when denying a request" using (tx.inputs.size == 1)
+                    "No reference states should be used" using (tx.references.isEmpty())
                     "No output states are created" using (tx.outputs.isEmpty())
                 }
             }
