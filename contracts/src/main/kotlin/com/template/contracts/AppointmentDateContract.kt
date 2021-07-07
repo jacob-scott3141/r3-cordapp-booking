@@ -26,18 +26,28 @@ class AppointmentDateContract : Contract {
     }
 
     override fun verify(tx: LedgerTransaction) {
-        requireThat {
-            "No inputs should be consumed when issuing a date" using (tx.inputs.isEmpty())
-            "Only one output state is created" using (tx.outputs.size == 1)
+        val command = tx.findCommand<Commands> { true }
+        when (command.value) {
+            is Commands.Create -> {
+                requireThat {
+                    "No inputs should be consumed when issuing a date" using (tx.inputs.isEmpty())
+                    "Only one output state is created" using (tx.outputs.size == 1)
 
-            val out = tx.outputStates[0] as AvailableAppointmentDate
-            "Dates must be of the format dd-MM-yyyy" using (checkDate(out.date))
+                    val out = tx.outputStates[0] as AvailableAppointmentDate
+                    "Dates must be of the format dd-MM-yyyy" using (checkDate(out.date))
+                }
+            }
 
-
+            is Commands.Consume -> {
+                requireThat {
+                    // do nothing for now
+                }
+            }
         }
     }
     interface Commands : CommandData {
-        class Create : AppointmentDateContract.Commands
+        class Create : Commands
+        class Consume : Commands
     }
 
 }

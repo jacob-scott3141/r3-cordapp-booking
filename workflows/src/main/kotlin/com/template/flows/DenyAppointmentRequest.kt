@@ -38,7 +38,8 @@ class DenyAppointmentRequest(private val alice: Party,
         //Compose the State that carries the appointment information
 
 
-        // Step 3. Create a new TransactionBuilder object.
+        // Step 3. Create a new TransactionBuilder object. The request is going to be consumed, but the availableDate will
+        //         continue to be available
         val builder = TransactionBuilder(notary)
                         .addInputState(request)
                         .addCommand(AppointmentContract.Commands.Create(), listOf(doctor.owningKey))

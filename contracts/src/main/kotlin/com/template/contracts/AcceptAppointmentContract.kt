@@ -27,7 +27,7 @@ class AppointmentContract : Contract {
         }
     }
     interface Commands : CommandData {
-        class Create : AppointmentContract.Commands
+        class Create : Commands
     }
 
 }

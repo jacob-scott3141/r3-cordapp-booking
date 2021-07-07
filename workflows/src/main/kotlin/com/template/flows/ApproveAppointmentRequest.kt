@@ -2,6 +2,8 @@ package com.template.flows
 
 import co.paralleluniverse.fibers.Suspendable
 import com.template.contracts.AppointmentContract
+import com.template.contracts.AppointmentDateContract
+import com.template.contracts.AppointmentRequestContract
 import net.corda.core.flows.*
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.flows.FinalityFlow
@@ -34,6 +36,7 @@ import java.util.*
 @InitiatingFlow
 @StartableByRPC
 class ApproveAppointmentRequest(private val alice: Party,
+                                private val bob: Party,
                                 private val date: String,
                                 private val availableDate: StateAndRef<AvailableAppointmentDate>,
                                 private val request: StateAndRef<AppointmentRequest>) : FlowLogic<SignedTransaction>() {
@@ -55,11 +58,11 @@ class ApproveAppointmentRequest(private val alice: Party,
                 alice
         )
 
-        // Step 3. Create a new TransactionBuilder object.
+        // Step 3. Create a new TransactionBuilder object. The availableDate and the request are going to be consumed.
         val builder = TransactionBuilder(notary)
                 .addCommand(AppointmentContract.Commands.Create(), listOf(doctor.owningKey))
-                .addInputState(availableDate)
-                .addInputState(request)
+                .addInputState(availableDate).addCommand(AppointmentDateContract.Commands.Consume(), listOf(doctor.owningKey))
+                .addInputState(request).addCommand(AppointmentRequestContract.Commands.Accept(), listOf(doctor.owningKey))
                 .addOutputState(output)
 
         // Step 4. Verify and sign it with our KeyPair.
@@ -69,6 +72,7 @@ class ApproveAppointmentRequest(private val alice: Party,
 
         // Step 6. Collect the other party's signature using the SignTransactionFlow.
         val otherParties: MutableList<Party> = output.participants.stream().map { el: AbstractParty? -> el as Party? }.collect(Collectors.toList())
+        otherParties.add(bob)
         otherParties.remove(ourIdentity)
         val sessions = otherParties.stream().map { el: Party? -> initiateFlow(el!!) }.collect(Collectors.toList())
 
