@@ -1,10 +1,7 @@
 package com.template.contracts
 
 import com.template.states.AppointmentRequest
-import net.corda.core.contracts.CommandData
-import net.corda.core.contracts.Contract
-import net.corda.core.contracts.TypeOnlyCommandData
-import net.corda.core.contracts.requireThat
+import net.corda.core.contracts.*
 import net.corda.core.transactions.LedgerTransaction
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -32,17 +29,14 @@ class AppointmentRequestContract : Contract {
         when (command.value) {
             is Commands.Create -> {
                 requireThat {
-                    "No inputs should be consumed when issuing a date" using (tx.inputs.isEmpty())
-                    "1 reference state should be used" using (tx.references.size == 1)
-                    "Only one output state is created" using (tx.outputs.size == 1)
-
-                    val out = tx.outputStates[0] as AppointmentRequest
-                    "Dates must be of the format dd-MM-yyyy" using (checkDate(out.date))
+//                    "No inputs should be consumed when issuing a date" using (tx.inputs.isEmpty())
+//                    "1 reference state should be used" using (tx.references.size == 1)
+//                    "Only one output state is created" using (tx.outputs.size == 1)
                 }
             }
             is Commands.Accept -> {
                 requireThat {
-                    "2 inputs should be consumed when accepting a request" using (tx.inputs.size == 1)
+                    "2 inputs should be consumed when accepting a request" using (tx.inputs.size == 2)
                     "No reference states should be used when accepting a request" using (tx.references.isEmpty())
                     "1 Output state is created" using (tx.outputs.size == 1)
                 }
