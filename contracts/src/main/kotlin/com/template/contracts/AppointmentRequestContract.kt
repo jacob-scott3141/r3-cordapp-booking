@@ -29,9 +29,9 @@ class AppointmentRequestContract : Contract {
         when (command.value) {
             is Commands.Create -> {
                 requireThat {
-//                    "No inputs should be consumed when issuing a date" using (tx.inputs.isEmpty())
-//                    "1 reference state should be used" using (tx.references.size == 1)
-//                    "Only one output state is created" using (tx.outputs.size == 1)
+                    "No inputs should be consumed when issuing a date" using (tx.inputs.isEmpty())
+                    "1 reference state should be used" using (tx.references.size == 1)
+                    "Only one output state is created" using (tx.outputs.size == 1)
                 }
             }
             is Commands.Accept -> {
