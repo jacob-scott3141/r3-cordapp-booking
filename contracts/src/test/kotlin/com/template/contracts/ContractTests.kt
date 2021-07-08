@@ -24,6 +24,25 @@ class ContractTests {
     val appointmentState = Appointment("16-01-2000", doctor.party, alice.party)
 
     @Test
+    fun dateIssuanceTest(){
+        ledgerServices.ledger {
+            transaction {
+                //date is created
+                output(AppointmentDateContract.ID, appointmentReferenceState)
+                command(doctor.publicKey, AppointmentDateContract.Commands.Create())
+                verifies()
+            }
+
+            transaction {
+                //date creation fails - cannot be created by alice or bob
+                output(AppointmentDateContract.ID, appointmentReferenceState)
+                command(alice.publicKey, AppointmentDateContract.Commands.Create())
+                fails()
+            }
+        }
+    }
+
+    @Test
     fun requestTest() {
         ledgerServices.ledger {
             transaction {
@@ -45,7 +64,7 @@ class ContractTests {
     fun acceptTest() {
         ledgerServices.ledger {
             transaction {
-                //passing transaction
+                //successfully accepted
                 input(AppointmentRequestContract.ID, requestState)
                 input(AppointmentRequestContract.ID, appointmentReferenceState)
                 output(AppointmentRequestContract.ID, appointmentState)
@@ -58,10 +77,29 @@ class ContractTests {
     fun denyTest() {
         ledgerServices.ledger {
             transaction {
-                //passing transaction
+                //successfully denied
                 input(AppointmentRequestContract.ID, requestState)
                 command(doctor.publicKey, AppointmentRequestContract.Commands.Deny())
                 verifies()
+            }
+        }
+    }
+    @Test
+    fun dateFormatTest(){
+        ledgerServices.ledger {
+            transaction {
+                //date creation passes
+                val goodDate = AvailableAppointmentDate("25-02-2018", doctor.party, alice.party, bob.party)
+                output(AppointmentDateContract.ID, goodDate)
+                command(doctor.publicKey, AppointmentDateContract.Commands.Create())
+                verifies()
+            }
+            transaction {
+                //date creation fails
+                val badDate = AvailableAppointmentDate("not-a-date", doctor.party, alice.party, bob.party)
+                output(AppointmentDateContract.ID, badDate)
+                command(doctor.publicKey, AppointmentDateContract.Commands.Create())
+                fails()
             }
         }
     }

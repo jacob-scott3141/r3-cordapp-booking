@@ -18,12 +18,9 @@ class AppointmentContract : Contract {
 
     override fun verify(tx: LedgerTransaction) {
         requireThat {
-            "2 inputs should be consumed when accepting an appointment" using (tx.inputs.size == 2)
-            "Only one output state is created" using (tx.outputs.size == 1)
-
-            //val out = tx.outputs.single() as Appointment
-
-
+            "No inputs should be consumed when accepting a request" using (tx.inputs.isEmpty())
+            "No reference states should be used when accepting a request" using (tx.references.isEmpty())
+            "No Output states are created" using (tx.outputs.isEmpty())
         }
     }
     interface Commands : CommandData {
