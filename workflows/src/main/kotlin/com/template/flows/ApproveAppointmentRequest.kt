@@ -76,10 +76,8 @@ class ApproveAppointmentRequest(private val alice: Party,
         otherParties.remove(ourIdentity)
         val sessions = otherParties.stream().map { el: Party? -> initiateFlow(el!!) }.collect(Collectors.toList())
 
-        val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
-
         // Step 7. Assuming no exceptions, we can now finalise the transaction
-        return subFlow<SignedTransaction>(FinalityFlow(stx, sessions))
+        return subFlow<SignedTransaction>(FinalityFlow(ptx, sessions))
     }
 }
 
@@ -87,14 +85,7 @@ class ApproveAppointmentRequest(private val alice: Party,
 class ApprovalResponder(val counterpartySession: FlowSession) : FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
-        val signTransactionFlow = object : SignTransactionFlow(counterpartySession) {
-            override fun checkTransaction(stx: SignedTransaction) = requireThat {
-                //Addition checks
-                //TODO think about what checks can be done here
-            }
-        }
-        val txId = subFlow(signTransactionFlow).id
-        return subFlow(ReceiveFinalityFlow(counterpartySession, expectedTxId = txId))
+        return subFlow(ReceiveFinalityFlow(counterpartySession))
     }
 }
 
