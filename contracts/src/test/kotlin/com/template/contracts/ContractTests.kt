@@ -34,9 +34,9 @@ class ContractTests {
                 verifies()
             }
             transaction {
-                //failing transaction (no reference supplied)
-                output(AppointmentRequestContract.ID, requestState)
-                command(bob.publicKey, AppointmentRequestContract.Commands.Create())
+                //failing transaction (Bob cannot accept nor deny Alice's transaction)
+                input(AppointmentRequestContract.ID, requestState)
+                command(bob.publicKey, AppointmentRequestContract.Commands.Deny())
                 fails()
             }
         }

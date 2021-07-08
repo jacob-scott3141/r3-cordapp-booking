@@ -49,6 +49,10 @@ class AppointmentRequestContract : Contract {
 
                     "The available date and requested date must be the same" using (in1.date == in2.date)
 
+                    val signer = tx.commandsOfType<Commands.Accept>()[0].signers[0]
+                    val doctor = in1.doctor
+
+                    "The doctor must be the first signer of the transaction" using (signer == doctor.owningKey)
                 }
             }
             is Commands.Deny -> {
@@ -56,6 +60,13 @@ class AppointmentRequestContract : Contract {
                     "1 input should be consumed when denying a request when denying a request" using (tx.inputs.size == 1)
                     "No reference states should be used" using (tx.references.isEmpty())
                     "No output states are created" using (tx.outputs.isEmpty())
+
+                    val in1 = tx.inputsOfType<AppointmentRequest>()[0]
+
+                    val signer = tx.commandsOfType<Commands.Deny>()[0].signers[0]
+                    val doctor = in1.doctor
+
+                    "The doctor must be the first signer of the transaction" using (signer == doctor.owningKey)
                 }
             }
         }
