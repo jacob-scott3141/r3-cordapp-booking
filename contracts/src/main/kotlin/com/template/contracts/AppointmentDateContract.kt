@@ -31,10 +31,16 @@ class AppointmentDateContract : Contract {
             is Commands.Create -> {
                 requireThat {
                     "No inputs should be consumed when issuing a date" using (tx.inputs.isEmpty())
+                    "No reference states should be used" using (tx.references.isEmpty())
                     "Only one output state is created" using (tx.outputs.size == 1)
 
-                    val out = tx.outputStates[0] as AvailableAppointmentDate
-                    "Dates must be of the format dd-MM-yyyy" using (checkDate(out.date))
+                    val in1 = tx.outputsOfType<AvailableAppointmentDate>()[0]
+                    "Date must match format dd-MM-yyyy" using (checkDate(in1.date))
+
+                    val signer = tx.commandsOfType<AppointmentDateContract.Commands.Create>()[0].signers[0]
+                    val doctor = in1.doctor
+
+                    "The doctor must be the signer of the transaction" using (signer == doctor.owningKey)
                 }
             }
 

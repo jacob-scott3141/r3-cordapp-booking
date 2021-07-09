@@ -1,6 +1,7 @@
 package com.template.contracts
 
 import com.template.states.AppointmentRequest
+import com.template.states.AvailableAppointmentDate
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.TypeOnlyCommandData
@@ -43,15 +44,35 @@ class AppointmentRequestContract : Contract {
             is Commands.Accept -> {
                 requireThat {
                     "2 inputs should be consumed when accepting a request" using (tx.inputs.size == 2)
+                    "No reference states should be used when accepting a request" using (tx.references.isEmpty())
                     "1 Output state is created" using (tx.outputs.size == 1)
+
+                    val in1 = tx.inputsOfType<AvailableAppointmentDate>()[0]
+                    val in2 = tx.inputsOfType<AppointmentRequest>()[0]
+
+                    "The available date and requested date must be the same" using (in1.date == in2.date)
+
+                    val signer = tx.commandsOfType<Commands.Accept>()[0].signers[0]
+                    val doctor = in1.doctor
+
+                    "The doctor must be the first signer of the transaction" using (signer == doctor.owningKey)
                 }
             }
             is Commands.Deny -> {
                 requireThat {
                     "1 input should be consumed when denying a request" using (tx.inputs.size == 1)
+                    "No reference states should be used" using (tx.references.isEmpty())
                     "No output states are created" using (tx.outputs.isEmpty())
+
+                    val in1 = tx.inputsOfType<AppointmentRequest>()[0]
+
+                    val signer = tx.commandsOfType<Commands.Deny>()[0].signers[0]
+                    val doctor = in1.doctor
+
+                    "The doctor must be the first signer of the transaction" using (signer == doctor.owningKey)
                 }
             }
+            else -> throw IllegalArgumentException("Command %s does not exist".format(command.value.javaClass.canonicalName))
         }
 
     }
