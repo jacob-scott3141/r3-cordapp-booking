@@ -1,6 +1,7 @@
 package com.template.contracts
 
 import com.template.states.Appointment
+import com.template.states.AppointmentRequest
 import com.template.states.AvailableAppointmentDate
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
@@ -18,9 +19,16 @@ class AppointmentContract : Contract {
 
     override fun verify(tx: LedgerTransaction) {
         requireThat {
-            "No inputs should be consumed when accepting a request" using (tx.inputs.isEmpty())
+            "2 inputs should be consumed when accepting a request" using (tx.inputs.size == 2)
             "No reference states should be used when accepting a request" using (tx.references.isEmpty())
-            "No Output states are created" using (tx.outputs.isEmpty())
+            "1 output state is created" using (tx.outputs.size == 1)
+
+            val in1 = tx.inputsOfType<AppointmentRequest>()[0]
+
+            val signer = tx.commandsOfType<AppointmentContract.Commands.Create>()[0].signers[0]
+            val doctor = in1.doctor
+
+            "The doctor must be the first signer of the transaction" using (signer == doctor.owningKey)
         }
     }
     interface Commands : CommandData {

@@ -4,6 +4,7 @@ import com.template.states.AppointmentRequest
 import com.template.states.AvailableAppointmentDate
 import net.corda.core.contracts.*
 import net.corda.core.transactions.LedgerTransaction
+import java.lang.IllegalArgumentException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
@@ -57,7 +58,7 @@ class AppointmentRequestContract : Contract {
             }
             is Commands.Deny -> {
                 requireThat {
-                    "1 input should be consumed when denying a request when denying a request" using (tx.inputs.size == 1)
+                    "1 input should be consumed when denying a request" using (tx.inputs.size == 1)
                     "No reference states should be used" using (tx.references.isEmpty())
                     "No output states are created" using (tx.outputs.isEmpty())
 
@@ -69,6 +70,8 @@ class AppointmentRequestContract : Contract {
                     "The doctor must be the first signer of the transaction" using (signer == doctor.owningKey)
                 }
             }
+
+            else -> throw IllegalArgumentException("Command %s does not exist".format(command.value.javaClass.canonicalName))
         }
 
     }

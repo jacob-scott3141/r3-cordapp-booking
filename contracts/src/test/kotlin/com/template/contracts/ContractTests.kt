@@ -69,6 +69,7 @@ class ContractTests {
                 input(AppointmentRequestContract.ID, appointmentReferenceState)
                 output(AppointmentRequestContract.ID, appointmentState)
                 command(doctor.publicKey, AppointmentRequestContract.Commands.Accept())
+                command(doctor.publicKey, AppointmentContract.Commands.Create())
                 verifies()
             }
         }
