@@ -50,11 +50,11 @@ class DenyAppointmentRequest(private val alice: Party,
         val ptx = serviceHub.signInitialTransaction(builder)
 
         // Step 6. Collect the other party's signature using the SignTransactionFlow.
-        val otherParties: MutableList<Party> = listOf(alice).stream().map { el: AbstractParty? -> el as Party? }.collect(Collectors.toList())
+        val otherParties: MutableList<Party> = mutableListOf(alice)
         val sessions = otherParties.stream().map { el: Party? -> initiateFlow(el!!) }.collect(Collectors.toList())
 
         // Step 7. Assuming no exceptions, we can now finalise the transaction
-        return subFlow<SignedTransaction>(FinalityFlow(ptx, sessions))
+        return subFlow(FinalityFlow(ptx, sessions))
     }
 
 }

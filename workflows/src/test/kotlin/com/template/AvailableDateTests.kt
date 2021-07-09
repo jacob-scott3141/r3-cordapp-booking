@@ -3,6 +3,7 @@ package com.template
 import com.natpryce.hamkrest.assertion.assertThat
 import com.template.flows.CreateAppointmentDate
 import com.template.states.AvailableAppointmentDate
+import net.corda.core.identity.Party
 import net.corda.testing.node.*
 import org.junit.After
 import org.junit.Before
@@ -13,6 +14,7 @@ import net.corda.core.transactions.SignedTransaction
 import net.corda.core.node.services.Vault.StateStatus
 import net.corda.core.utilities.getOrThrow
 import java.util.*
+import kotlin.test.assertEquals
 
 
 class AvailableDateTests {
@@ -20,6 +22,7 @@ class AvailableDateTests {
     private lateinit var doctor: StartedMockNode
     private lateinit var alice: StartedMockNode
     private lateinit var bob: StartedMockNode
+    private lateinit var patientList: List<Party>
 
     @Before
     fun setup() {
@@ -30,6 +33,7 @@ class AvailableDateTests {
         doctor = network.createPartyNode()
         alice = network.createPartyNode()
         bob = network.createPartyNode()
+        patientList = listOf(bob.info.legalIdentities[0], alice.info.legalIdentities[0])
         network.runNetwork()
     }
 
@@ -39,13 +43,15 @@ class AvailableDateTests {
     }
     @Test
     fun createAvailableDateTest() {
-        val flow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], "06-07-2021")
+        val flow = CreateAppointmentDate(patientList, "06-07-2021")
         val future: Future<SignedTransaction> = doctor.startFlow(flow)
         network.runNetwork()
 
         //successful query means the state is stored at node alice's vault. Flow went through.
         val inputCriteria: QueryCriteria = QueryCriteria.VaultQueryCriteria().withStatus(StateStatus.UNCONSUMED)
-        val state = alice.services.vaultService.queryBy(AvailableAppointmentDate::class.java, inputCriteria).states[0].state.data
+        val state = alice.services.vaultService.queryBy(AvailableAppointmentDate::class.java, inputCriteria).states
+
+        assertEquals(1, state.size, "date not created")
 
         future.getOrThrow()
     }

@@ -27,6 +27,7 @@ import net.corda.core.transactions.TransactionBuilder
 
 import net.corda.core.contracts.requireThat
 import net.corda.core.identity.AbstractParty
+import sun.security.ec.point.ProjectivePoint
 import java.util.*
 
 
@@ -35,8 +36,8 @@ import java.util.*
 // *********
 @InitiatingFlow
 @StartableByRPC
-class ApproveAppointmentRequest(private val alice: Party,
-                                private val bob: Party,
+class ApproveAppointmentRequest(private val requestPatient: Party,
+                                private val datePatients: MutableList<Party>,
                                 private val date: String,
                                 private val availableDate: StateAndRef<AvailableAppointmentDate>,
                                 private val request: StateAndRef<AppointmentRequest>) : FlowLogic<SignedTransaction>() {
@@ -55,7 +56,7 @@ class ApproveAppointmentRequest(private val alice: Party,
         val output = Appointment(
                 date,
                 doctor,
-                alice
+                requestPatient
         )
 
         // Step 3. Create a new TransactionBuilder object. The availableDate and the request are going to be consumed.
@@ -71,13 +72,12 @@ class ApproveAppointmentRequest(private val alice: Party,
 
 
         // Step 6. Collect the other party's signature using the SignTransactionFlow.
-        val otherParties: MutableList<Party> = output.participants.stream().map { el: AbstractParty? -> el as Party? }.collect(Collectors.toList())
-        otherParties.add(bob)
-        otherParties.remove(ourIdentity)
+        val otherParties: MutableList<Party> = datePatients
+        otherParties.add(requestPatient)
         val sessions = otherParties.stream().map { el: Party? -> initiateFlow(el!!) }.collect(Collectors.toList())
 
         // Step 7. Assuming no exceptions, we can now finalise the transaction
-        return subFlow<SignedTransaction>(FinalityFlow(ptx, sessions))
+        return subFlow(FinalityFlow(ptx, sessions))
     }
 }
 
@@ -88,5 +88,3 @@ class ApprovalResponder(val counterpartySession: FlowSession) : FlowLogic<Signed
         return subFlow(ReceiveFinalityFlow(counterpartySession))
     }
 }
-
-

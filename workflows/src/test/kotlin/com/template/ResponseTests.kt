@@ -14,6 +14,7 @@ import java.util.concurrent.Future
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import com.template.states.AvailableAppointmentDate
+import net.corda.core.identity.Party
 import net.corda.core.node.services.Vault
 import net.corda.core.node.services.vault.Builder.equal
 import net.corda.core.utilities.getOrThrow
@@ -27,6 +28,7 @@ class ResponseTests {
     private lateinit var doctor: StartedMockNode
     private lateinit var alice: StartedMockNode
     private lateinit var bob: StartedMockNode
+    private lateinit var patientList: List<Party>
 
     @Before
     fun setup() {
@@ -39,6 +41,7 @@ class ResponseTests {
         doctor = network.createPartyNode()
         alice = network.createPartyNode()
         bob = network.createPartyNode()
+        patientList = listOf(bob.info.legalIdentities[0], alice.info.legalIdentities[0])
         network.runNetwork()
     }
 
@@ -48,7 +51,7 @@ class ResponseTests {
     }
     @Test
     fun approveRequest() {
-        val availableDateFlow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], "06-07-2021")
+        val availableDateFlow = CreateAppointmentDate(patientList, "06-07-2021")
         val future1 = doctor.startFlow(availableDateFlow)
 
         network.runNetwork()
@@ -67,7 +70,7 @@ class ResponseTests {
         future.getOrThrow()
 
         val approvalFlow = ApproveAppointmentRequest(alice.info.legalIdentities[0],
-            bob.info.legalIdentities[0],
+            mutableListOf(bob.info.legalIdentities[0]),
             "06-07-2021",
             appointmentDate,
             appointmentRequest)
@@ -86,7 +89,7 @@ class ResponseTests {
 
     @Test
     fun denyRequest() {
-        val availableDateFlow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], "06-07-2021")
+        val availableDateFlow = CreateAppointmentDate(patientList, "06-07-2021")
         val future1 = doctor.startFlow(availableDateFlow)
 
         network.runNetwork()
