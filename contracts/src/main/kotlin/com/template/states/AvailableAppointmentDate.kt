@@ -1,6 +1,7 @@
 package com.template.states
 
 import com.template.contracts.AppointmentDateContract
+import com.template.contracts.AppointmentRequestContract
 import com.template.schemas.AppointmentDateSchemaV1
 import net.corda.core.contracts.BelongsToContract
 import net.corda.core.identity.AbstractParty
@@ -13,7 +14,7 @@ import java.lang.IllegalStateException
 // *********
 // * State *
 // *********
-@BelongsToContract(AppointmentDateContract::class)
+@BelongsToContract(AppointmentRequestContract::class)
 data class AvailableAppointmentDate(val date: String,
                                     val doctor: Party,
                                     val alice: Party,

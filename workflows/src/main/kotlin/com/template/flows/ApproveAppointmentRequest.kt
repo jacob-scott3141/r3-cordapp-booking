@@ -2,6 +2,7 @@ package com.template.flows
 
 import co.paralleluniverse.fibers.Suspendable
 import com.template.contracts.AppointmentContract
+import com.template.contracts.AppointmentRequestContract
 import net.corda.core.flows.*
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.flows.FinalityFlow
@@ -52,6 +53,8 @@ class ApproveAppointmentRequest(private val alice: Party,
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
+
+                .addCommand(AppointmentRequestContract.Commands.Accept(), listOf(doctor.owningKey, alice.owningKey))
                 .addCommand(AppointmentContract.Commands.Create(), listOf(doctor.owningKey, alice.owningKey))
                 .addOutputState(output)
 
