@@ -6,7 +6,9 @@ import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.TypeOnlyCommandData
 import net.corda.core.contracts.requireThat
+import net.corda.core.contracts.*
 import net.corda.core.transactions.LedgerTransaction
+import java.lang.IllegalArgumentException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
@@ -37,8 +39,8 @@ class AppointmentRequestContract : Contract {
                     "1 reference state should be used" using (tx.references.size == 1)
                     "Only one output state is created" using (tx.outputs.size == 1)
 
-                    val out = tx.outputStates[0] as AppointmentRequest
-                    "Dates must be of the format dd-MM-yyyy" using (checkDate(out.date))
+                    val ref = tx.referenceInputRefsOfType<AvailableAppointmentDate>()[0].state.data
+                    "Date must match format dd-MM-yyyy" using (checkDate(ref.date))
                 }
             }
             is Commands.Accept -> {

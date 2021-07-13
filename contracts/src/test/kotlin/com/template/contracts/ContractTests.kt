@@ -18,7 +18,7 @@ class ContractTests {
     var doctor = TestIdentity(CordaX500Name("Doc", "TestLand", "US"))
     var alice = TestIdentity(CordaX500Name("Alice", "TestLand", "US"))
     var bob = TestIdentity(CordaX500Name("Bob", "TestLand", "US"))
-
+    
     val appointmentReferenceState = AvailableAppointmentDate("16-01-2000", doctor.party, alice.party, bob.party)
     val requestState = AppointmentRequest("16-01-2000", doctor.party, alice.party)
     val appointmentState = Appointment("16-01-2000", doctor.party, alice.party)
