@@ -51,7 +51,7 @@ class ResponseTests {
     }
     @Test
     fun approveRequest() {
-        val availableDateFlow = CreateAppointmentDate(patientList, "06-07-2021")
+        val availableDateFlow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], "06-07-2021")
         val future1 = doctor.startFlow(availableDateFlow)
 
         network.runNetwork()
@@ -62,7 +62,7 @@ class ResponseTests {
         val appointmentDate = alice.services.vaultService.queryBy(AvailableAppointmentDate::class.java, customCriteria).states[0]
 
         // should try to run a vault query to see if the appointment request state was in fact created
-        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], "06-07-2021", appointmentDate)
+        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], "06-07-2021")
         val future: Future<SignedTransaction> = alice.startFlow(flow)
         network.runNetwork()
         val inputCriteria: QueryCriteria = QueryCriteria.VaultQueryCriteria().withStatus(Vault.StateStatus.UNCONSUMED)
@@ -70,10 +70,7 @@ class ResponseTests {
         future.getOrThrow()
 
         val approvalFlow = ApproveAppointmentRequest(alice.info.legalIdentities[0],
-            mutableListOf(bob.info.legalIdentities[0]),
-            "06-07-2021",
-            appointmentDate,
-            appointmentRequest)
+            "06-07-2021")
         val approvalFuture = doctor.startFlow(approvalFlow)
         network.runNetwork()
         approvalFuture.getOrThrow()
@@ -89,7 +86,7 @@ class ResponseTests {
 
     @Test
     fun denyRequest() {
-        val availableDateFlow = CreateAppointmentDate(patientList, "06-07-2021")
+        val availableDateFlow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], "06-07-2021")
         val future1 = doctor.startFlow(availableDateFlow)
 
         network.runNetwork()
@@ -100,7 +97,7 @@ class ResponseTests {
         val appointmentDate = alice.services.vaultService.queryBy(AvailableAppointmentDate::class.java, customCriteria).states[0]
 
         // should try to run a vault query to see if the appointment request state was in fact created
-        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], "06-07-2021", appointmentDate)
+        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], "06-07-2021")
         val future: Future<SignedTransaction> = alice.startFlow(flow)
         network.runNetwork()
         val inputCriteria: QueryCriteria = QueryCriteria.VaultQueryCriteria().withStatus(Vault.StateStatus.UNCONSUMED)
@@ -108,7 +105,7 @@ class ResponseTests {
         future.getOrThrow()
 
         val denyingFlow = DenyAppointmentRequest(alice.info.legalIdentities[0],
-            appointmentRequest)
+            "06-07-2021")
         val denyingFuture = doctor.startFlow(denyingFlow)
         network.runNetwork()
         denyingFuture.getOrThrow()

@@ -47,7 +47,7 @@ class AppointmentRequestTests {
     }
     @Test
     fun requestAppointmentTest() {
-        val availableDateFlow = CreateAppointmentDate(patientList, "06-07-2021")
+        val availableDateFlow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], "06-07-2021")
         val future1 = doctor.startFlow(availableDateFlow)
 
         network.runNetwork()
@@ -58,7 +58,7 @@ class AppointmentRequestTests {
         val appointmentDate = alice.services.vaultService.queryBy(AvailableAppointmentDate::class.java, customCriteria).states[0]
 
         // should try to run a vault query to see if the appointment request state was in fact created
-        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], "06-07-2021", appointmentDate)
+        val flow = CreateAppointmentRequest(doctor.info.legalIdentities[0], "06-07-2021")
         val future: Future<SignedTransaction> = alice.startFlow(flow)
         network.runNetwork()
         future.getOrThrow()

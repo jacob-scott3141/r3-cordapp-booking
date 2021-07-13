@@ -19,7 +19,7 @@ class ContractTests {
 
     @Test
     fun requestTest() {
-        val stateReference = AvailableAppointmentDate("16-01-2000", doctor.party, listOf(alice.party, bob.party))
+        val stateReference = AvailableAppointmentDate("16-01-2000", doctor.party, alice.party, bob.party)
         val state = AppointmentRequest("16-01-2000", doctor.party, alice.party)
 
         ledgerServices.ledger {

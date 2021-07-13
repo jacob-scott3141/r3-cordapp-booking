@@ -25,7 +25,8 @@ import net.corda.core.identity.AbstractParty
 // *********
 @InitiatingFlow
 @StartableByRPC
-class CreateAppointmentDate(private val patientList: List<Party>,
+class CreateAppointmentDate(private val alice: Party,
+                            private val bob: Party,
                             private val date: String) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
 
@@ -42,7 +43,8 @@ class CreateAppointmentDate(private val patientList: List<Party>,
         val output = AvailableAppointmentDate(
             date,
             doctor,
-            patientList
+            alice,
+            bob
         )
 
         // Step 3. Create a new TransactionBuilder object.
@@ -56,7 +58,7 @@ class CreateAppointmentDate(private val patientList: List<Party>,
 
 
         // Step 6. Collect the other party's and send using the FinalityFlow.
-        val otherParties: MutableList<Party> = patientList as MutableList<Party>
+        val otherParties: MutableList<Party> = listOf(alice, bob) as MutableList<Party>
         val sessions = otherParties.stream().map { el: Party? -> initiateFlow(el!!) }.collect(Collectors.toList())
 
         // Step 7. Assuming no exceptions, we can now finalise the transaction

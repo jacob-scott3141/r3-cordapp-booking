@@ -43,7 +43,7 @@ class AvailableDateTests {
     }
     @Test
     fun createAvailableDateTest() {
-        val flow = CreateAppointmentDate(patientList, "06-07-2021")
+        val flow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], "06-07-2021")
         val future: Future<SignedTransaction> = doctor.startFlow(flow)
         network.runNetwork()
 
