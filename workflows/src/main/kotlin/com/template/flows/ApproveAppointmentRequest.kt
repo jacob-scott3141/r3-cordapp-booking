@@ -44,7 +44,8 @@ class ApproveAppointmentRequest(private val alice: Party,
     @Suspendable
     override fun call(): SignedTransaction {
         lateinit var appointmentDate: StateAndRef<AvailableAppointmentDate>
-        lateinit var bob: Party
+        lateinit var aliceNotify: Party
+        lateinit var bobNotify: Party
 
         val vaultAppointmentDates = serviceHub.vaultService.queryBy(AvailableAppointmentDate::class.java).states
 
@@ -52,7 +53,9 @@ class ApproveAppointmentRequest(private val alice: Party,
         for(stateAndRef in vaultAppointmentDates){
             if(stateAndRef.state.data.date == this.date){
                 appointmentDate = stateAndRef
-                bob = stateAndRef.state.data.bob
+
+                aliceNotify = stateAndRef.state.data.alice
+                bobNotify = stateAndRef.state.data.bob
                 found1 = true
             }
         }
@@ -98,7 +101,7 @@ class ApproveAppointmentRequest(private val alice: Party,
 
 
             // Step 6. Collect the other party's signature using the SignTransactionFlow.
-            val otherParties: MutableList<Party> = listOf(alice, bob) as MutableList<Party>
+            val otherParties: MutableList<Party> = listOf(aliceNotify, bobNotify) as MutableList<Party>
             val sessions = otherParties.stream().map { el: Party? -> initiateFlow(el!!) }.collect(Collectors.toList())
 
             // Step 7. Assuming no exceptions, we can now finalise the transaction

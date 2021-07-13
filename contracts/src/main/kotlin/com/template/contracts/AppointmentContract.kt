@@ -14,7 +14,7 @@ import java.util.*
 class AppointmentContract : Contract {
     companion object {
         // Used to identify our contract when building a transaction.
-        const val ID = "com.template.contracts.AcceptAppointmentContract"
+        const val ID = "com.template.contracts.AppointmentContract"
     }
 
     override fun verify(tx: LedgerTransaction) {
