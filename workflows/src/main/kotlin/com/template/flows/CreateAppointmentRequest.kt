@@ -35,7 +35,7 @@ class CreateAppointmentRequest(private val doctor: Party,
     @Suspendable
     override fun call(): SignedTransaction {
 
-        val alice = ourIdentity
+        val patient = ourIdentity
 
         // Step 1. Get a reference to the notary service on our network and our key pair.
         // Note: ongoing work to support multiple notary identities is still in progress.
@@ -45,12 +45,12 @@ class CreateAppointmentRequest(private val doctor: Party,
         val output = AppointmentRequest(
                 date,
                 doctor,
-                alice
+                patient
         )
 
         // Step 3. Create a new TransactionBuilder object.
         val builder = TransactionBuilder(notary)
-                .addCommand(AppointmentRequestContract.Commands.Create(), listOf(alice.owningKey))
+                .addCommand(AppointmentRequestContract.Commands.Create(), listOf(patient.owningKey))
                 .addOutputState(output)
                 .addReferenceState(appointmentDate.referenced())
 
@@ -60,12 +60,11 @@ class CreateAppointmentRequest(private val doctor: Party,
 
 
         // Step 6. Collect the other party's signature using the SignTransactionFlow.
-        val otherParties: MutableList<Party> = output.participants.stream().map { el: AbstractParty? -> el as Party? }.collect(Collectors.toList())
-        otherParties.remove(ourIdentity)
+        val otherParties: MutableList<Party> = mutableListOf(doctor)
         val sessions = otherParties.stream().map { el: Party? -> initiateFlow(el!!) }.collect(Collectors.toList())
 
         // Step 7. Assuming no exceptions, we can now finalise the transaction
-        return subFlow<SignedTransaction>(FinalityFlow(ptx, sessions))
+        return subFlow(FinalityFlow(ptx, sessions))
     }
 
 }

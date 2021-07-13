@@ -27,22 +27,34 @@ class AppointmentDateContract : Contract {
     }
 
     override fun verify(tx: LedgerTransaction) {
-        requireThat {
-            "No inputs should be consumed when issuing a date" using (tx.inputs.isEmpty())
-            "No reference states should be used" using (tx.references.isEmpty())
-            "Only one output state is created" using (tx.outputs.size == 1)
+        val command = tx.findCommand<Commands> { true }
+        when (command.value) {
+            is Commands.Create -> {
+                requireThat {
+                    "No inputs should be consumed when issuing a date" using (tx.inputs.isEmpty())
+                    "No reference states should be used" using (tx.references.isEmpty())
+                    "Only one output state is created" using (tx.outputs.size == 1)
 
-            val in1 = tx.outputsOfType<AvailableAppointmentDate>()[0]
-            "Date must match format dd-MM-yyyy" using (checkDate(in1.date))
+                    val in1 = tx.outputsOfType<AvailableAppointmentDate>()[0]
+                    "Date must match format dd-MM-yyyy" using (checkDate(in1.date))
 
-            val signer = tx.commandsOfType<AppointmentDateContract.Commands.Create>()[0].signers[0]
-            val doctor = in1.doctor
+                    val signer = tx.commandsOfType<AppointmentDateContract.Commands.Create>()[0].signers[0]
+                    val doctor = in1.doctor
 
-            "The doctor must be the signer of the transaction" using (signer == doctor.owningKey)
+                    "The doctor must be the signer of the transaction" using (signer == doctor.owningKey)
+                }
+            }
+
+            is Commands.Consume -> {
+                requireThat {
+                    // do nothing for now
+                }
+            }
         }
     }
     interface Commands : CommandData {
-        class Create : AppointmentDateContract.Commands
+        class Create : Commands
+        class Consume : Commands
     }
 
 }

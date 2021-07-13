@@ -11,6 +11,7 @@ import java.util.concurrent.Future
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import com.template.states.AvailableAppointmentDate
+import net.corda.core.identity.Party
 import net.corda.core.node.services.Vault
 import net.corda.core.node.services.vault.Builder.equal
 import net.corda.core.utilities.getOrThrow
@@ -23,6 +24,7 @@ class AppointmentRequestTests {
     private lateinit var doctor: StartedMockNode
     private lateinit var alice: StartedMockNode
     private lateinit var bob: StartedMockNode
+    private lateinit var patientList: List<Party>
 
     @Before
     fun setup() {
@@ -35,6 +37,7 @@ class AppointmentRequestTests {
         doctor = network.createPartyNode()
         alice = network.createPartyNode()
         bob = network.createPartyNode()
+        patientList = listOf(alice.info.legalIdentities[0], bob.info.legalIdentities[0])
         network.runNetwork()
     }
 
@@ -44,7 +47,7 @@ class AppointmentRequestTests {
     }
     @Test
     fun requestAppointmentTest() {
-        val availableDateFlow = CreateAppointmentDate(alice.info.legalIdentities[0], bob.info.legalIdentities[0], "06-07-2021")
+        val availableDateFlow = CreateAppointmentDate(patientList, "06-07-2021")
         val future1 = doctor.startFlow(availableDateFlow)
 
         network.runNetwork()

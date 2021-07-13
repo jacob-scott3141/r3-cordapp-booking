@@ -14,17 +14,16 @@ import java.lang.IllegalStateException
 // *********
 // * State *
 // *********
-@BelongsToContract(AppointmentRequestContract::class)
+@BelongsToContract(AppointmentDateContract::class)
 data class AvailableAppointmentDate(val date: String,
                                     val doctor: Party,
-                                    val alice: Party,
-                                    val bob: Party,
-                                    override val participants: List<AbstractParty> = listOf(doctor, bob, alice)
+                                    val patientList: List<Party>,
+                                    override val participants: List<AbstractParty> = (patientList + doctor)
 ) : QueryableState {
     override fun generateMappedObject(schema: MappedSchema): PersistentState {
         return when (schema) {
             is AppointmentDateSchemaV1 -> AppointmentDateSchemaV1.AvailableDate(
-                date = this.date.toString()
+                date = this.date
             )
             else -> throw IllegalStateException("Unrecognized schema ${schema.name} passed.")
         }

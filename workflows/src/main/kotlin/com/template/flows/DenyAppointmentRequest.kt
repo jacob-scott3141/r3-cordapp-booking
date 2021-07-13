@@ -4,6 +4,7 @@ import co.paralleluniverse.fibers.Suspendable
 import com.template.contracts.AppointmentContract
 import com.template.contracts.AppointmentRequestContract
 import com.template.states.Appointment
+import com.template.states.AppointmentRequest
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
@@ -22,7 +23,7 @@ import java.util.stream.Collectors
 @InitiatingFlow
 @StartableByRPC
 class DenyAppointmentRequest(private val alice: Party,
-                             private val date: String) : FlowLogic<SignedTransaction>() {
+                             private val request: StateAndRef<AppointmentRequest>) : FlowLogic<SignedTransaction>() {
     override val progressTracker = ProgressTracker()
 
     @Suspendable
@@ -37,37 +38,23 @@ class DenyAppointmentRequest(private val alice: Party,
         //Compose the State that carries the appointment information
 
 
-        // Step 3. Create a new TransactionBuilder object.
+        // Step 3. Create a new TransactionBuilder object. The request is going to be consumed, but the availableDate will
+        //         continue to be available
         val builder = TransactionBuilder(notary)
-                .addCommand(AppointmentRequestContract.Commands.Deny(), listOf(doctor.owningKey, alice.owningKey))
+                        .addInputState(request)
+                        .addCommand(AppointmentRequestContract.Commands.Deny(), listOf(doctor.owningKey))
 
 
         // Step 4. Verify and sign it with our KeyPair.
         builder.verify(serviceHub)
         val ptx = serviceHub.signInitialTransaction(builder)
 
-        val states = serviceHub.vaultService.queryBy(Appointment::class.java)
-        //get state from states using id
-        var output: Appointment? = null
-        for(state: StateAndRef<Appointment> in states.states){
-            if(date == state.state.data.date){
-                output=state.state.data
-            }
-        }
-
-        if(output==null){
-            throw StatesNotAvailableException("State not Found")
-        }
-
         // Step 6. Collect the other party's signature using the SignTransactionFlow.
-        val otherParties: MutableList<Party> = output.participants.stream().map { el: AbstractParty? -> el as Party? }.collect(Collectors.toList())
-        otherParties.remove(ourIdentity)
+        val otherParties: MutableList<Party> = mutableListOf(alice)
         val sessions = otherParties.stream().map { el: Party? -> initiateFlow(el!!) }.collect(Collectors.toList())
 
-        val stx = subFlow(CollectSignaturesFlow(ptx, sessions))
-
         // Step 7. Assuming no exceptions, we can now finalise the transaction
-        return subFlow<SignedTransaction>(FinalityFlow(stx, sessions))
+        return subFlow(FinalityFlow(ptx, sessions))
     }
 
 }
@@ -76,13 +63,6 @@ class DenyAppointmentRequest(private val alice: Party,
 class DenialResponder(val counterpartySession: FlowSession) : FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
-        val signTransactionFlow = object : SignTransactionFlow(counterpartySession) {
-            override fun checkTransaction(stx: SignedTransaction) = requireThat {
-                //Addition checks
-                //TODO think about what checks can be done here
-            }
-        }
-        val txId = subFlow(signTransactionFlow).id
-        return subFlow(ReceiveFinalityFlow(counterpartySession, expectedTxId = txId))
+        return subFlow(ReceiveFinalityFlow(counterpartySession))
     }
 }

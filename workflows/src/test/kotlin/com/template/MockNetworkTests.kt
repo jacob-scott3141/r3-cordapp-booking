@@ -3,6 +3,7 @@ package com.template
 import com.template.flows.CreateAppointmentDate
 import com.template.flows.CreateDateResponder
 import net.corda.core.identity.CordaX500Name
+import net.corda.core.utilities.getOrThrow
 import net.corda.testing.internal.chooseIdentityAndCert
 import net.corda.testing.node.*
 import org.junit.After
@@ -36,17 +37,17 @@ class MockNetworkTests {
 
     @Test
     fun flowReturnsCorrectState() {
-        val doc = nodeD.info.chooseIdentityAndCert().party
         val alice = nodeA.info.chooseIdentityAndCert().party
         val bob = nodeB.info.chooseIdentityAndCert().party
 
+        val patientList = listOf(alice, bob)
+
         println("found parties")
 
-        val flow = CreateAppointmentDate(alice,bob,"16-01-2000")
+        val flow = CreateAppointmentDate(patientList,"16-01-2000")
         val future = nodeD.startFlow(flow)
         mockNet.runNetwork()
-
-        println("date correct")
+        future.getOrThrow()
     }
 
     @After
