@@ -18,8 +18,8 @@ class ContractTests {
     var doctor = TestIdentity(CordaX500Name("Doc", "TestLand", "US"))
     var alice = TestIdentity(CordaX500Name("Alice", "TestLand", "US"))
     var bob = TestIdentity(CordaX500Name("Bob", "TestLand", "US"))
-
-    val appointmentReferenceState = AvailableAppointmentDate("16-01-2000", doctor.party, listOf(alice.party, bob.party))
+    
+    val appointmentReferenceState = AvailableAppointmentDate("16-01-2000", doctor.party, alice.party, bob.party)
     val requestState = AppointmentRequest("16-01-2000", doctor.party, alice.party)
     val appointmentState = Appointment("16-01-2000", doctor.party, alice.party)
 
@@ -90,14 +90,14 @@ class ContractTests {
         ledgerServices.ledger {
             transaction {
                 //date creation passes
-                val goodDate = AvailableAppointmentDate("25-02-2018", doctor.party, listOf(alice.party, bob.party))
+                val goodDate = AvailableAppointmentDate("25-02-2018", doctor.party, alice.party, bob.party)
                 output(AppointmentDateContract.ID, goodDate)
                 command(doctor.publicKey, AppointmentDateContract.Commands.Create())
                 verifies()
             }
             transaction {
                 //date creation fails
-                val badDate = AvailableAppointmentDate("not-a-date", doctor.party, listOf(alice.party, bob.party))
+                val badDate = AvailableAppointmentDate("not-a-date", doctor.party, alice.party, bob.party)
                 output(AppointmentDateContract.ID, badDate)
                 command(doctor.publicKey, AppointmentDateContract.Commands.Create())
                 fails()

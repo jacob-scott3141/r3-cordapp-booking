@@ -2,6 +2,10 @@ package com.template.contracts
 
 import com.template.states.AppointmentRequest
 import com.template.states.AvailableAppointmentDate
+import net.corda.core.contracts.CommandData
+import net.corda.core.contracts.Contract
+import net.corda.core.contracts.TypeOnlyCommandData
+import net.corda.core.contracts.requireThat
 import net.corda.core.contracts.*
 import net.corda.core.transactions.LedgerTransaction
 import java.lang.IllegalArgumentException
@@ -42,6 +46,7 @@ class AppointmentRequestContract : Contract {
             is Commands.Accept -> {
                 requireThat {
                     "2 inputs should be consumed when accepting a request" using (tx.inputs.size == 2)
+                    "No reference states should be used when accepting a request" using (tx.references.isEmpty())
                     "1 Output state is created" using (tx.outputs.size == 1)
 
                     val in1 = tx.inputsOfType<AvailableAppointmentDate>()[0]
@@ -69,7 +74,6 @@ class AppointmentRequestContract : Contract {
                     "The doctor must be the first signer of the transaction" using (signer == doctor.owningKey)
                 }
             }
-
             else -> throw IllegalArgumentException("Command %s does not exist".format(command.value.javaClass.canonicalName))
         }
 

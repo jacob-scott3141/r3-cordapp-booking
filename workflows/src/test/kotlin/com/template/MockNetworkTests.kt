@@ -44,7 +44,7 @@ class MockNetworkTests {
 
         println("found parties")
 
-        val flow = CreateAppointmentDate(patientList,"16-01-2000")
+        val flow = CreateAppointmentDate(alice, bob,"16-01-2000")
         val future = nodeD.startFlow(flow)
         mockNet.runNetwork()
         future.getOrThrow()

@@ -17,8 +17,9 @@ import java.lang.IllegalStateException
 @BelongsToContract(AppointmentDateContract::class)
 data class AvailableAppointmentDate(val date: String,
                                     val doctor: Party,
-                                    val patientList: List<Party>,
-                                    override val participants: List<AbstractParty> = (patientList + doctor)
+                                    val alice: Party,
+                                    val bob: Party,
+                                    override val participants: List<AbstractParty> = listOf(alice, bob, doctor)
 ) : QueryableState {
     override fun generateMappedObject(schema: MappedSchema): PersistentState {
         return when (schema) {
